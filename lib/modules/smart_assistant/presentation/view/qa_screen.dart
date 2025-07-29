@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../controller/qa_controller.dart';
+import 'package:flutter_math_fork/flutter_math.dart';
 
 class QAScreen extends ConsumerStatefulWidget {
   const QAScreen({super.key});
@@ -98,7 +99,8 @@ class _QAScreenState extends ConsumerState<QAScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               if (msg.text.isNotEmpty)
-                                Text(msg.text, style: TextStyle(fontSize: 16)),
+                                _buildMessageContent(msg.text),
+
                               if (msg.imagePath != null)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 6.0),
@@ -218,5 +220,99 @@ class _QAScreenState extends ConsumerState<QAScreen> {
     _textController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Widget _buildMessageContent(String text) {
+    // Nhận diện và paint nhiều công thức toán học trong cùng một đoạn text
+    // Nhận diện $...$, $$...$$, \(...\), \[...\]
+    final latexRegex = RegExp(
+      r'(\$\$.*?\$\$|\$.*?\$|\\\(.*?\\\)|\\\[.*?\\\])',
+      dotAll: true,
+    );
+    final spans = <Widget>[];
+    int lastIndex = 0;
+    final matches = latexRegex.allMatches(text);
+    for (final match in matches) {
+      // Đoạn text trước công thức
+      if (match.start > lastIndex) {
+        final before = text.substring(lastIndex, match.start);
+        if (before.trim().isNotEmpty) {
+          spans.add(Text(before.trim(), style: const TextStyle(fontSize: 16)));
+        }
+      }
+      // Công thức toán học
+      var formula = match
+          .group(0)!
+          .replaceAll("\n", " ")
+          .replaceAll("\u0000", "");
+      // Loại bỏ ký tự $ hoặc $$, \(, \) hoặc \[, \] ở đầu/cuối (tối ưu)
+      if (formula.startsWith(r'$$') && formula.endsWith(r'$$')) {
+        formula = formula.substring(2, formula.length - 2);
+      } else if (formula.startsWith(r'$') && formula.endsWith(r'$')) {
+        formula = formula.substring(1, formula.length - 1);
+      } else if (formula.startsWith(r'\(') && formula.endsWith(r'\)')) {
+        formula = formula.substring(2, formula.length - 2);
+      } else if (formula.startsWith(r'\[') && formula.endsWith(r'\]')) {
+        formula = formula.substring(2, formula.length - 2);
+      }
+      formula = formula.trim();
+      // Nếu công thức bắt đầu bằng ký tự \ dư, loại bỏ 1 lần (chỉ khi không phải lệnh latex)
+      if (formula.startsWith('\\') &&
+          !RegExp(
+            r'^\\(frac|sqrt|int|sum|lim|sin|cos|tan|log|ln|binom)',
+          ).hasMatch(formula)) {
+        formula = formula.substring(1);
+      }
+
+      spans.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Math.tex(
+              formula,
+              textStyle: const TextStyle(
+                fontSize: 18,
+                color: Colors.deepPurple,
+              ),
+            ),
+          ),
+        ),
+      );
+      lastIndex = match.end;
+    }
+    // Đoạn text sau công thức cuối cùng
+    if (lastIndex < text.length) {
+      final after = text.substring(lastIndex);
+      if (after.trim().isNotEmpty) {
+        spans.add(Text(after.trim(), style: const TextStyle(fontSize: 16)));
+      }
+    }
+    if (spans.isNotEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: spans,
+      );
+    }
+    // Nếu không có $...$, thử nhận diện công thức toán học phổ biến
+    final mathLike = RegExp(
+      r'[=+\-*/^_\\]|\\frac|\\sqrt|\\int|\\sum|\\lim|\\sin|\\cos|\\tan|\\log|\\ln',
+    );
+    if (mathLike.hasMatch(text)) {
+      try {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Math.tex(
+            text,
+            textStyle: const TextStyle(fontSize: 18, color: Colors.deepPurple),
+          ),
+        );
+      } catch (e) {
+        // Nếu lỗi, fallback về Text thường
+        return Text(text, style: const TextStyle(fontSize: 16));
+      }
+    }
+    // Nếu không có công thức, hiển thị text bình thường
+    return Text(text, style: const TextStyle(fontSize: 16));
   }
 }

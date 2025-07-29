@@ -12,11 +12,11 @@ class QAService {
     : _dio = dio ?? Dio(),
       _apiKey =
           apiKey ??
-          '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';
+          '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';
 
   /// Gửi câu hỏi (text) và/hoặc ảnh lên OpenAI API, trả về phản hồi dạng text
   Future<String> sendQuestion({required String question, File? image}) async {
-    const endpoint = 'https://api.openai.com/v1/chat/completions';
+    const endpoint = 'https://openrouter.ai/api/v1/chat/completions';
 
     try {
       if (image == null) {
@@ -28,10 +28,12 @@ class QAService {
             headers: {
               'Authorization': 'Bearer $_apiKey',
               'Content-Type': 'application/json',
+              // 'HTTP-Referer': '<YOUR_SITE_URL>', // Optional
+              // 'X-Title': '<YOUR_SITE_NAME>', // Optional
             },
           ),
           data: {
-            'model': 'gpt-4.1',
+            'model': 'openai/gpt-4o',
             'messages': [
               {'role': 'user', 'content': question},
             ],
@@ -57,7 +59,7 @@ class QAService {
             },
           ),
           data: {
-            'model': 'gpt-4-vision-preview',
+            'model': 'openai/gpt-4o',
             'messages': [
               {
                 'role': 'user',
