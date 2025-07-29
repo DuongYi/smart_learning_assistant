@@ -1,5 +1,21 @@
 # smart_learning_assistant
 
+## Lưu trữ lịch sử chat bằng SQLite
+
+Ứng dụng sử dụng SQLite (package sqflite) để lưu trữ nội dung chat. Đảm bảo thêm vào pubspec.yaml:
+
+```yaml
+dependencies:
+  sqflite: ^2.3.0
+  path: ^1.8.3
+```
+
+Sau đó chạy:
+
+```sh
+flutter pub get
+```
+
 Smart Learning Assitant
 
 ## Getting Started

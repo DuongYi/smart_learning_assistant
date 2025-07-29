@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:smart_learning_assistant/core/routes/routes.dart';
 import 'package:smart_learning_assistant/modules/auth/login_screen.dart';
 import 'package:smart_learning_assistant/modules/home/presentation/view/home_screen.dart';
+import 'package:smart_learning_assistant/modules/smart_assistant/presentation/view/qa_screen.dart';
 
 // GoRouter provider using Riverpod
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -16,6 +17,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.home,
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: Routes.smartAssistant,
+        builder: (context, state) => const QAScreen(),
       ),
     ],
   );
