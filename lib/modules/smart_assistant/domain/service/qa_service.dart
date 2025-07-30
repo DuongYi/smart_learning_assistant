@@ -12,7 +12,7 @@ class QAService {
     : _dio = dio ?? Dio(),
       _apiKey =
           apiKey ??
-          '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';
+          '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';
 
   /// Gửi câu hỏi (text) và/hoặc ảnh lên OpenAI API, trả về phản hồi dạng text
   Future<String> sendQuestion({required String question, File? image}) async {
@@ -37,7 +37,7 @@ class QAService {
             'messages': [
               {'role': 'user', 'content': question},
             ],
-            'max_tokens': 1024,
+            'max_tokens': 100024,
           },
         );
         Logger().f('[QAService] API CALL: $endpoint');
@@ -75,7 +75,7 @@ class QAService {
             'max_tokens': 1024,
           },
         );
-        Logger().i('[QAService] Response: ${response.data}');
+        Logger().i('[QAService] Response: $response');
         return response.data['choices'][0]['message']['content'] as String;
       }
     } catch (e, stack) {

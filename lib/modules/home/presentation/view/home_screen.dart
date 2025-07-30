@@ -42,6 +42,14 @@ class HomeScreen extends ConsumerWidget {
                 context.go(Routes.smartAssistant);
               },
             ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.ac_unit_sharp),
+              label: const Text('Dummy Screen'),
+              onPressed: () {
+                context.go(Routes.dummyScreen);
+              },
+            ),
           ],
         ),
       ),

@@ -38,7 +38,7 @@ final class QAControllerProvider
   }
 }
 
-String _$qAControllerHash() => r'944d4d667ee4a18e27a0e9e292c8e895c829af04';
+String _$qAControllerHash() => r'b650e79de0b982d0d1865627acabf37230f0c174';
 
 abstract class _$QAController extends $Notifier<QAState> {
   QAState build();

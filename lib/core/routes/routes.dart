@@ -8,4 +8,6 @@ class Routes {
   static const String about = '/about';
   static const String help = '/help';
   static const String smartAssistant = '/smart_assistant';
+
+  static const String dummyScreen = '/dummy_screen';
 }

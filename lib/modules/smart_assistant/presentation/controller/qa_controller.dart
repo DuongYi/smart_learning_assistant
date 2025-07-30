@@ -48,6 +48,7 @@ class QAController extends _$QAController {
         question: question,
         image: image,
       );
+
       final botMsg = QAChatMessage(text: response, isUser: false);
       await ChatDBService().insertMessage(botMsg.text, null, false);
       final updatedHistory = List<QAChatMessage>.from(state.history)
