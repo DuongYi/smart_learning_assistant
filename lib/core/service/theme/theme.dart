@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 
+enum VsThemeMode { light, dark, system, darkGreen }
+
 class KeyColor {
   static Color primary = const Color(0xFF006971);
   static Color secondary = const Color(0xFF4A6365);
@@ -8,6 +10,7 @@ class KeyColor {
   static Color neutral = const Color(0xFF5C5F5F);
   static Color neutralVariant = const Color(0xFF566061);
   static Color error = const Color(0xFFBA1A1A);
+  static Color darkGreen = const Color(0xFF1B5E20);
 }
 
 TextTheme textTheme = TextTheme(
@@ -156,6 +159,42 @@ ThemeData darkTheme = ThemeData(
     inverseSurface: KeyColor.neutral.tone(90),
     onInverseSurface: KeyColor.neutral.tone(20),
     inversePrimary: KeyColor.primary.tone(40),
+  ),
+  appBarTheme: const AppBarTheme(centerTitle: false, scrolledUnderElevation: 0),
+  splashFactory: InkSparkle.splashFactory,
+);
+
+ThemeData darkGreenTheme = ThemeData(
+  useMaterial3: true,
+  fontFamily: 'Pretendard',
+  textTheme: textTheme,
+  colorScheme: ColorScheme.dark(
+    brightness: Brightness.dark,
+    primary: KeyColor.darkGreen.tone(80),
+    onPrimary: KeyColor.darkGreen.tone(20),
+    primaryContainer: KeyColor.darkGreen.tone(30),
+    onPrimaryContainer: KeyColor.darkGreen.tone(90),
+    secondary: const Color(0xFF388E3C),
+    onSecondary: Colors.white,
+    secondaryContainer: const Color(0xFF66BB6A),
+    onSecondaryContainer: Colors.black,
+    tertiary: const Color(0xFF43A047),
+    onTertiary: Colors.white,
+    error: KeyColor.error.tone(80),
+    onError: KeyColor.error.tone(20),
+    errorContainer: KeyColor.error.tone(30),
+    onErrorContainer: KeyColor.error.tone(90),
+    surface: KeyColor.darkGreen.tone(10),
+    onSurface: KeyColor.darkGreen.tone(90),
+    surfaceContainerHighest: KeyColor.darkGreen.tone(30),
+    onSurfaceVariant: KeyColor.darkGreen.tone(80),
+    outline: KeyColor.darkGreen.tone(60),
+    outlineVariant: KeyColor.darkGreen.tone(30),
+    scrim: Colors.black,
+    shadow: Colors.black,
+    inverseSurface: KeyColor.darkGreen.tone(90),
+    onInverseSurface: KeyColor.darkGreen.tone(20),
+    inversePrimary: KeyColor.darkGreen.tone(40),
   ),
   appBarTheme: const AppBarTheme(centerTitle: false, scrolledUnderElevation: 0),
   splashFactory: InkSparkle.splashFactory,

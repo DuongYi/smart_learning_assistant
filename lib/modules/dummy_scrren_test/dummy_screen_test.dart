@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:smart_learning_assistant/core/routes/routes.dart';
 
 class DummyScreenTest extends StatelessWidget {
   const DummyScreenTest({super.key});
@@ -111,29 +113,35 @@ class DummyScreenTest extends StatelessWidget {
                 ],
               ),
               const Spacer(),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withValues(alpha: 0.25),
-                      blurRadius: 24,
-                      spreadRadius: 2,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: const Center(
-                  child: Text(
-                    "+  New chat",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      letterSpacing: 0.5,
-                      fontWeight: FontWeight.w600,
+              GestureDetector(
+                onTap: () {
+                  // Handle new chat creation
+                  context.push(Routes.smartAssistant);
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withValues(alpha: 0.25),
+                        blurRadius: 24,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "+  New chat",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        letterSpacing: 0.5,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
