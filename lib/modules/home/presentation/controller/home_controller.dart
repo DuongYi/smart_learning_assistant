@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:smart_learning_assistant/modules/home/application/home_service_provider.dart';
@@ -6,6 +7,10 @@ import 'package:smart_learning_assistant/modules/home/presentation/state/home_st
 final homeControllerProvider = NotifierProvider<HomeController, HomeState>(
   HomeController.new,
 );
+
+final homeTabProvider = StateProvider<int>((ref) {
+  return 0;
+});
 
 class HomeController extends Notifier<HomeState> {
   @override

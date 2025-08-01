@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_learning_assistant/base/widget/k_text.dart';
 import 'package:smart_learning_assistant/core/routes/routes.dart';
 
 class DummyScreenTest extends StatelessWidget {
@@ -195,13 +196,11 @@ class AutomationCard extends StatelessWidget {
         children: [
           Icon(icon, size: 28, color: Colors.black),
           const SizedBox(height: 10),
-          Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              color: Colors.black,
-            ),
+          KText(
+            text: title,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.black,
           ),
           const Spacer(),
           Container(
@@ -212,7 +211,7 @@ class AutomationCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(
-              child: Text("generate", style: TextStyle(color: Colors.white)),
+              child: KText(text: "generate", color: Colors.white),
             ),
           ),
         ],
