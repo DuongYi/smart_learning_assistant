@@ -9,4 +9,4 @@ analyzer:
   errors:
     invalid_annotation_target: ignore
     unnecessary_string_escapes: ignore
-    unused_import: error
+    unused_import: warning

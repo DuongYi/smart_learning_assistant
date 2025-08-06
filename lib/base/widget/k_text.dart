@@ -29,7 +29,7 @@ class KText extends ConsumerWidget {
     this.fontStyle = FontStyle.normal,
     this.textDecoration = TextDecoration.none,
     this.decorationColor = Colors.grey,
-    this.fontFamily = 'Mulish',
+    this.fontFamily = 'SFPro',
     this.lineHeight,
   });
 

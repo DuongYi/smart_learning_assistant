@@ -1,12 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:smart_learning_assistant/base/widget/k_text.dart';
-import 'package:smart_learning_assistant/core/routes/routes.dart';
-import 'package:smart_learning_assistant/core/service/theme/theme.dart';
 import 'package:smart_learning_assistant/modules/dummy_scrren_test/dummy_screen_test.dart';
-import 'package:smart_learning_assistant/modules/home/presentation/controller/home_controller.dart';
-import 'package:smart_learning_assistant/modules/home/presentation/widget/appbar_home_widget.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:smart_learning_assistant/modules/home/presentation/widget/appbar_new_home_widget.dart';
+import 'package:smart_learning_assistant/modules/home/presentation/widget/home_title_widget.dart';
 
 class StickyNoteCard extends StatelessWidget {
   final String title;
@@ -135,12 +135,48 @@ class StickyNoteCard extends StatelessWidget {
   }
 }
 
-class HomeTabScreen extends ConsumerWidget {
+class HomeTabScreen extends ConsumerStatefulWidget {
   const HomeTabScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final homeController = ref.watch(homeControllerProvider.notifier);
+  ConsumerState<HomeTabScreen> createState() => _HomeTabScreenState();
+}
+
+class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
+  final TextEditingController _textController = TextEditingController();
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final XFile? picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        _selectedImage = File(picked.path);
+      });
+    }
+  }
+
+  Future<void> _pickCamera() async {
+    final XFile? picked = await _picker.pickImage(source: ImageSource.camera);
+    if (picked != null) {
+      setState(() {
+        _selectedImage = File(picked.path);
+      });
+    }
+  }
+
+  void _sendMessage() {
+    _textController.clear();
+    setState(() {
+      _selectedImage = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final PageController pageController = PageController(
+      viewportFraction: 0.78,
+    );
 
     return SingleChildScrollView(
       child: Column(
@@ -153,69 +189,137 @@ class HomeTabScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // AppBar
-                AppBarHomeWidget(),
+                AppBarNewHomeWidget(),
 
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-                GestureDetector(
-                  onTap: () {
-                    // Handle new chat creation
-                    context.push(Routes.smartAssistant);
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(100),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFFFFFFF).tone(50),
-                          blurRadius: 24,
-                          spreadRadius: 2,
+                // Input gửi tin nhắn + ảnh
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(100),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.2),
+                                blurRadius: 4,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: TextField(
+                            controller: _textController,
+                            minLines: 1,
+                            maxLines: 3,
+                            style: const TextStyle(fontSize: 16),
+                            decoration: const InputDecoration(
+                              hintText: 'Đặt câu hỏi về môn học...',
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                            ),
+                            onSubmitted: (_) => _sendMessage(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(100),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.2),
+                              blurRadius: 4,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: PopupMenuButton<int>(
+                          icon: Icon(
+                            CupertinoIcons.camera,
+                            color: Colors.black,
+                          ),
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: 0,
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.photo, size: 18),
+                                  SizedBox(width: 8),
+                                  Text('Chọn từ thư viện'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 1,
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.camera_alt, size: 18),
+                                  SizedBox(width: 8),
+                                  Text('Chụp ảnh'),
+                                ],
+                              ),
+                            ),
+                          ],
+                          onSelected: (value) {
+                            if (value == 0) _pickImage();
+                            if (value == 1) _pickCamera();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (_selectedImage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Stack(
+                      alignment: Alignment.topRight,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(
+                            _selectedImage!,
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 20),
+                          onPressed: () =>
+                              setState(() => _selectedImage = null),
                         ),
                       ],
                     ),
-                    child: const Center(
-                      child: Text(
-                        "+  New chat",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          letterSpacing: 0.5,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
                   ),
-                ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 // Hiển thị nội dung tab đang chọn
-                KText(
-                  text: "Recent",
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                HomeTitleWidget(title: "Lịch sử hội thoại"),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    spacing: 10,
+                    children: const [
+                      RecentChip(label: "Job finder UX"),
+                      RecentChip(label: "Graphic design copy"),
+                      RecentChip(label: "Food planner"),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 10,
-                  children: const [
-                    RecentChip(label: "Job finder UX"),
-                    RecentChip(label: "Graphic design copy"),
-                    RecentChip(label: "Food planner"),
-                  ],
-                ),
-                const SizedBox(height: 25),
-                KText(
-                  text: "Automation",
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 16),
+                HomeTitleWidget(title: "Khám phá thêm"),
+                const SizedBox(height: 16),
                 Row(
                   children: const [
                     Expanded(
@@ -236,40 +340,9 @@ class HomeTabScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 25),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    KText(
-                      text: "Trending prompt",
-                      fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: Wrap(
-                    spacing: 10,
-
-                    children: const [
-                      PromptChip(label: "#1 Graphic design"),
-                      PromptChip(label: "#2 UX research"),
-                      PromptChip(label: "#3 Math solver"),
-                      PromptChip(label: "#4 Productivity to-do list"),
-                    ],
-                  ),
-                ),
-
-                // const Spacer(),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
+                HomeTitleWidget(title: "Ghi chú"),
+                const SizedBox(height: 8),
               ],
             ),
           ),
@@ -277,44 +350,75 @@ class HomeTabScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           SizedBox(
             height: 260,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                StickyNoteCard(
-                  title: 'Instagram Content Plan for Begginer',
-                  description:
-                      'in publishing and graphic design, lorem ipsum is a placeholder text. In publishing and graphic design, lorem ipsum is a placeholder text.',
-                  tags: ['#instagram', '#work'],
-                  time: 'Today at 6:30pm',
-                  icon: Icons.camera_alt,
-                  isFavorite: true,
-                  color: const Color(0xFFEDFBC1),
-                ),
-                StickyNoteCard(
-                  title: 'Some for Ux designer',
-                  description:
-                      'in publishing and graphic design, lorem ipsum is a placeholder text. In publishing and graphic design, lorem ipsum is a placeholder text.',
-                  tags: ['#rules', '#inspiration'],
-                  time: 'Today at 6:30pm',
-                  icon: Icons.design_services,
-                  color: const Color(0xFF23262F),
-                ),
-                StickyNoteCard(
-                  title: 'AI Content Plan',
-                  description:
-                      'AI can help you generate content ideas and schedule posts easily.',
-                  tags: ['#ai', '#content'],
-                  time: 'Tomorrow at 9:00am',
-                  icon: Icons.smart_toy,
-                  color: const Color(0xFFD1F2EB),
-                ),
-              ],
+            child: PageView.builder(
+              controller: pageController,
+              itemCount: 3,
+              itemBuilder: (context, index) {
+                return AnimatedBuilder(
+                  animation: pageController,
+                  builder: (context, child) {
+                    double value = 1.0;
+                    if (pageController.position.haveDimensions) {
+                      value =
+                          ((pageController.page ?? pageController.initialPage) -
+                                  index)
+                              .toDouble();
+                      value = (1 - (value.abs() * 0.18)).clamp(0.85, 1.0);
+                    }
+                    return Transform.scale(
+                      scale: value,
+                      child: Opacity(opacity: value, child: child),
+                    );
+                  },
+                  child: _buildStickyNoteByIndex(index),
+                );
+              },
             ),
           ),
+
+          const SizedBox(height: 100),
 
           // ...rest of your home tab content...
         ],
       ),
     );
+  }
+
+  Widget _buildStickyNoteByIndex(int index) {
+    switch (index) {
+      case 0:
+        return StickyNoteCard(
+          title: 'Instagram Content Plan for Begginer',
+          description:
+              'in publishing and graphic design, lorem ipsum is a placeholder text. In publishing and graphic design, lorem ipsum is a placeholder text.',
+          tags: ['#instagram', '#work'],
+          time: 'Today at 6:30pm',
+          icon: Icons.camera_alt,
+          isFavorite: true,
+          color: const Color(0xFFEDFBC1),
+        );
+      case 1:
+        return StickyNoteCard(
+          title: 'Some for Ux designer',
+          description:
+              'in publishing and graphic design, lorem ipsum is a placeholder text. In publishing and graphic design, lorem ipsum is a placeholder text.',
+          tags: ['#rules', '#inspiration'],
+          time: 'Today at 6:30pm',
+          icon: Icons.design_services,
+          color: const Color.fromARGB(255, 255, 255, 44),
+        );
+      case 2:
+        return StickyNoteCard(
+          title: 'AI Content Plan',
+          description:
+              'AI can help you generate content ideas and schedule posts easily.',
+          tags: ['#ai', '#content'],
+          time: 'Tomorrow at 9:00am',
+          icon: Icons.smart_toy,
+          color: const Color(0xFFD1F2EB),
+        );
+      default:
+        return const SizedBox();
+    }
   }
 }
