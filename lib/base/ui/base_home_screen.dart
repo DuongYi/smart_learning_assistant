@@ -52,40 +52,42 @@ class BaseHomeScreenState extends ConsumerState<BaseHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          stops: [0.0, 0.25, 0.5, 0.75, 1.0],
-          colors: [
-            Color(0xFF2B3636),
-            Color(0xFF242E2E),
-            Color(0xFF202427),
-            Color(0xFF1F1F1F),
-            Color(0xFF2B2B2B),
-          ],
+    return Material(
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+            colors: [
+              Color(0xFF2B3636),
+              Color(0xFF242E2E),
+              Color(0xFF202427),
+              Color(0xFF1F1F1F),
+              Color(0xFF2B2B2B),
+            ],
+          ),
         ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            if (widget.showSearch)
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: const InputDecoration(
-                    hintText: 'Tìm kiếm...',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(),
+        child: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              if (widget.showSearch)
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      hintText: 'Tìm kiếm...',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (text) => widget.onSearch(text, context, ref),
                   ),
-                  onChanged: (text) => widget.onSearch(text, context, ref),
                 ),
-              ),
-            Expanded(child: widget.buildBody(context, ref)),
-          ],
+              Expanded(child: widget.buildBody(context, ref)),
+            ],
+          ),
         ),
       ),
     );

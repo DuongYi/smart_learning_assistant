@@ -188,31 +188,26 @@ class AutomationCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       height: 170,
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: const Color.fromARGB(142, 209, 206, 206),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 28, color: Colors.black),
+          Icon(icon, size: 28, color: Colors.white),
           const SizedBox(height: 10),
           KText(
             text: title,
             fontWeight: FontWeight.bold,
-            fontSize: 14,
-            color: Colors.black,
+            fontSize: 16,
+            color: Colors.white,
           ),
-          const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Center(
-              child: KText(text: "generate", color: Colors.white),
-            ),
+          const SizedBox(height: 4),
+          KText(
+            text: subtitle,
+            fontWeight: FontWeight.normal,
+            fontSize: 14,
+            color: Colors.white,
           ),
         ],
       ),

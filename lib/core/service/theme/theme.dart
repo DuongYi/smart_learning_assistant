@@ -90,7 +90,7 @@ extension PercentageLetterSpacing on TextStyle {
 
 ThemeData lightTheme = ThemeData(
   useMaterial3: true,
-  fontFamily: 'Pretendard',
+  fontFamily: 'SFPro',
   textTheme: textTheme,
   colorScheme: ColorScheme.light(
     brightness: Brightness.light,
@@ -128,7 +128,7 @@ ThemeData lightTheme = ThemeData(
 
 ThemeData darkTheme = ThemeData(
   useMaterial3: true,
-  fontFamily: 'Pretendard',
+  fontFamily: 'SFPro',
   textTheme: textTheme,
   colorScheme: ColorScheme.dark(
     brightness: Brightness.dark,
@@ -166,7 +166,7 @@ ThemeData darkTheme = ThemeData(
 
 ThemeData darkGreenTheme = ThemeData(
   useMaterial3: true,
-  fontFamily: 'Pretendard',
+  fontFamily: 'SFPro',
   textTheme: textTheme,
   colorScheme: ColorScheme.dark(
     brightness: Brightness.dark,
