@@ -9,5 +9,5 @@ class Routes {
   static const String help = '/help';
   static const String smartAssistant = '/smart_assistant';
 
-  static const String dummyScreen = '/dummy_screen';
+  static const String settingScreen = '/settings_screen';
 }

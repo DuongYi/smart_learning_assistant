@@ -5,4 +5,5 @@ class AssetPath {
 
   // Image
   static const String defaultAvatar = '$_imagePath/default_avatar.png';
+  static const String backgroundImage = '$_imagePath/background.jpg';
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:smart_learning_assistant/base/widget/k_text.dart';
+import 'package:smart_learning_assistant/core/routes/routes.dart';
 import 'package:smart_learning_assistant/modules/dummy_scrren_test/dummy_screen_test.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -178,28 +180,62 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
       viewportFraction: 0.78,
     );
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // AppBar
-                AppBarNewHomeWidget(),
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // AppBar
+                  AppBarNewHomeWidget(),
 
-                const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
-                // Input gửi tin nhắn + ảnh
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
+                  // Input gửi tin nhắn + ảnh
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(100),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.white.withOpacity(0.2),
+                                  blurRadius: 4,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: TextField(
+                              controller: _textController,
+                              minLines: 1,
+                              maxLines: 3,
+                              style: const TextStyle(fontSize: 16),
+                              decoration: const InputDecoration(
+                                hintText: 'Đặt câu hỏi về môn học...',
+                                hintStyle: TextStyle(color: Colors.black54),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                              ),
+                              onSubmitted: (_) => _sendMessage(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(100),
@@ -211,175 +247,160 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
                               ),
                             ],
                           ),
-                          child: TextField(
-                            controller: _textController,
-                            minLines: 1,
-                            maxLines: 3,
-                            style: const TextStyle(fontSize: 16),
-                            decoration: const InputDecoration(
-                              hintText: 'Đặt câu hỏi về môn học...',
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
+                          child: PopupMenuButton<int>(
+                            icon: Icon(
+                              CupertinoIcons.camera,
+                              color: Colors.black,
+                            ),
+                            itemBuilder: (context) => [
+                              PopupMenuItem(
+                                value: 0,
+                                child: Row(
+                                  children: const [
+                                    Icon(Icons.photo, size: 18),
+                                    SizedBox(width: 8),
+                                    Text('Chọn từ thư viện'),
+                                  ],
+                                ),
                               ),
-                            ),
-                            onSubmitted: (_) => _sendMessage(),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(100),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.white.withOpacity(0.2),
-                              blurRadius: 4,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: PopupMenuButton<int>(
-                          icon: Icon(
-                            CupertinoIcons.camera,
-                            color: Colors.black,
-                          ),
-                          itemBuilder: (context) => [
-                            PopupMenuItem(
-                              value: 0,
-                              child: Row(
-                                children: const [
-                                  Icon(Icons.photo, size: 18),
-                                  SizedBox(width: 8),
-                                  Text('Chọn từ thư viện'),
-                                ],
+                              PopupMenuItem(
+                                value: 1,
+                                child: Row(
+                                  children: const [
+                                    Icon(Icons.camera_alt, size: 18),
+                                    SizedBox(width: 8),
+                                    Text('Chụp ảnh'),
+                                  ],
+                                ),
                               ),
-                            ),
-                            PopupMenuItem(
-                              value: 1,
-                              child: Row(
-                                children: const [
-                                  Icon(Icons.camera_alt, size: 18),
-                                  SizedBox(width: 8),
-                                  Text('Chụp ảnh'),
-                                ],
-                              ),
-                            ),
-                          ],
-                          onSelected: (value) {
-                            if (value == 0) _pickImage();
-                            if (value == 1) _pickCamera();
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (_selectedImage != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Stack(
-                      alignment: Alignment.topRight,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(
-                            _selectedImage!,
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.cover,
+                            ],
+                            onSelected: (value) {
+                              if (value == 0) _pickImage();
+                              if (value == 1) _pickCamera();
+                            },
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close, size: 20),
-                          onPressed: () =>
-                              setState(() => _selectedImage = null),
                         ),
                       ],
                     ),
                   ),
+                  if (_selectedImage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.file(
+                              _selectedImage!,
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, size: 20),
+                            onPressed: () =>
+                                setState(() => _selectedImage = null),
+                          ),
+                        ],
+                      ),
+                    ),
 
-                SizedBox(height: 20),
+                  SizedBox(height: 20),
 
-                // Hiển thị nội dung tab đang chọn
-                HomeTitleWidget(title: "Lịch sử hội thoại"),
-                const SizedBox(height: 8),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    spacing: 10,
-                    children: const [
-                      RecentChip(label: "Job finder UX"),
-                      RecentChip(label: "Graphic design copy"),
-                      RecentChip(label: "Food planner"),
+                  // Hiển thị nội dung tab đang chọn
+                  HomeTitleWidget(title: "Lịch sử hội thoại"),
+                  const SizedBox(height: 8),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      spacing: 10,
+                      children: const [
+                        RecentChip(label: "Job finder UX"),
+                        RecentChip(label: "Graphic design copy"),
+                        RecentChip(label: "Food planner"),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  HomeTitleWidget(title: "Chức năng hữu ích"),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _MainMenuButton(
+                        icon: Icons.question_answer_rounded,
+                        label: "Hỏi đáp AI",
+                        color: const Color(0xFF7C5CFC),
+                        onTap: () {
+                          context.push(Routes.smartAssistant);
+                        },
+                      ),
+                      _MainMenuButton(
+                        icon: Icons.calculate_rounded,
+                        label: "Giải toán",
+                        color: const Color(0xFF00C48C),
+                        onTap: () {
+                          // TODO: Chuyển sang màn giải toán
+                        },
+                      ),
+                      _MainMenuButton(
+                        icon: Icons.menu_book_rounded,
+                        label: "Tài liệu",
+                        color: const Color(0xFFFFB800),
+                        onTap: () {
+                          // TODO: Chuyển sang màn tài liệu
+                        },
+                      ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 16),
-                HomeTitleWidget(title: "Khám phá thêm"),
-                const SizedBox(height: 16),
-                Row(
-                  children: const [
-                    Expanded(
-                      child: AutomationCard(
-                        icon: Icons.shopping_bag,
-                        title: "Bussiness",
-                        subtitle: "Based on your morning routine",
-                      ),
-                    ),
-                    SizedBox(width: 15),
-                    Expanded(
-                      child: AutomationCard(
-                        icon: Icons.fitness_center,
-                        title: "Interviewing",
-                        subtitle:
-                            "AI writing function with advanced input for personlized",
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                HomeTitleWidget(title: "Ghi chú"),
-                const SizedBox(height: 8),
-              ],
+                  const SizedBox(height: 16),
+                  HomeTitleWidget(title: "Khám phá thêm"),
+                  const SizedBox(height: 16),
+                  _BannerCarousel(),
+                  const SizedBox(height: 16),
+                  HomeTitleWidget(title: "Ghi chú"),
+                  const SizedBox(height: 8),
+                ],
+              ),
             ),
-          ),
 
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 260,
-            child: PageView.builder(
-              controller: pageController,
-              itemCount: 3,
-              itemBuilder: (context, index) {
-                return AnimatedBuilder(
-                  animation: pageController,
-                  builder: (context, child) {
-                    double value = 1.0;
-                    if (pageController.position.haveDimensions) {
-                      value =
-                          ((pageController.page ?? pageController.initialPage) -
-                                  index)
-                              .toDouble();
-                      value = (1 - (value.abs() * 0.18)).clamp(0.85, 1.0);
-                    }
-                    return Transform.scale(
-                      scale: value,
-                      child: Opacity(opacity: value, child: child),
-                    );
-                  },
-                  child: _buildStickyNoteByIndex(index),
-                );
-              },
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 260,
+              child: PageView.builder(
+                controller: pageController,
+                itemCount: 3,
+                itemBuilder: (context, index) {
+                  return AnimatedBuilder(
+                    animation: pageController,
+                    builder: (context, child) {
+                      double value = 1.0;
+                      if (pageController.position.haveDimensions) {
+                        value =
+                            ((pageController.page ??
+                                        pageController.initialPage) -
+                                    index)
+                                .toDouble();
+                        value = (1 - (value.abs() * 0.18)).clamp(0.85, 1.0);
+                      }
+                      return Transform.scale(
+                        scale: value,
+                        child: Opacity(opacity: value, child: child),
+                      );
+                    },
+                    child: _buildStickyNoteByIndex(index),
+                  );
+                },
+              ),
             ),
-          ),
 
-          const SizedBox(height: 100),
+            const SizedBox(height: 100),
 
-          // ...rest of your home tab content...
-        ],
+            // ...rest of your home tab content...
+          ],
+        ),
       ),
     );
   }
@@ -420,5 +441,122 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
       default:
         return const SizedBox();
     }
+  }
+}
+
+class _MainMenuButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  const _MainMenuButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 104,
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              child: Icon(icon, color: Colors.white, size: 28),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+                color: Colors.white70,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BannerCarousel extends StatefulWidget {
+  @override
+  State<_BannerCarousel> createState() => _BannerCarouselState();
+}
+
+class _BannerCarouselState extends State<_BannerCarousel> {
+  final PageController _controller = PageController(viewportFraction: 0.88);
+  int _current = 0;
+  final List<String> _images = [
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
+    'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80',
+    'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 120,
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: _images.length,
+            onPageChanged: (i) => setState(() => _current = i),
+            itemBuilder: (context, index) {
+              return Container(
+                margin: const EdgeInsets.only(right: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(22),
+                  color: Colors.grey[200],
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.10),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                  image: DecorationImage(
+                    image: NetworkImage(_images[index]),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            _images.length,
+            (i) => AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: _current == i ? 18 : 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: _current == i ? Colors.deepPurple : Colors.grey[400],
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

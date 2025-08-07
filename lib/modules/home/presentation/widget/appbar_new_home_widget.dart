@@ -46,7 +46,7 @@ class AppBarNewHomeWidget extends ConsumerWidget {
               ],
             ),
           ),
-          // Notification Icon
+          // Avatar
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(

@@ -6,10 +6,10 @@ final themeModeProvider = StateNotifierProvider<ThemeController, VsThemeMode>(
 );
 
 class ThemeController extends StateNotifier<VsThemeMode> {
-  ThemeController() : super(VsThemeMode.system);
+  ThemeController() : super(VsThemeMode.dark);
 
   void toggleTheme() {
-    state = state == VsThemeMode.light ? VsThemeMode.dark : VsThemeMode.light;
+    state = state == VsThemeMode.dark ? VsThemeMode.light : VsThemeMode.dark;
   }
 
   void setTheme(VsThemeMode mode) {
