@@ -10,4 +10,7 @@ class Routes {
   static const String smartAssistant = '/smart_assistant';
 
   static const String settingScreen = '/settings_screen';
+
+  // Calculator
+  static const String calculatorScreen = '/calculator_screen';
 }

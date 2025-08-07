@@ -2,9 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:smart_learning_assistant/base/widget/k_text.dart';
 import 'package:smart_learning_assistant/core/routes/routes.dart';
-import 'package:smart_learning_assistant/modules/dummy_scrren_test/dummy_screen_test.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:smart_learning_assistant/modules/home/presentation/widget/appbar_new_home_widget.dart';
@@ -342,7 +340,7 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
                         label: "Giải toán",
                         color: const Color(0xFF00C48C),
                         onTap: () {
-                          // TODO: Chuyển sang màn giải toán
+                          context.push(Routes.calculatorScreen);
                         },
                       ),
                       _MainMenuButton(
@@ -454,7 +452,6 @@ class _MainMenuButton extends StatelessWidget {
     required this.label,
     required this.color,
     required this.onTap,
-    super.key,
   });
 
   @override
@@ -557,6 +554,20 @@ class _BannerCarouselState extends State<_BannerCarousel> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class RecentChip extends StatelessWidget {
+  final String label;
+  const RecentChip({required this.label, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      label: Text(label),
+      backgroundColor: Colors.grey[300],
+      labelStyle: const TextStyle(color: Colors.black),
     );
   }
 }

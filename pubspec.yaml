@@ -53,6 +53,7 @@ dependencies:
   #Sql lite for local database
   sqflite: ^2.4.2
   flutter_math_fork: ^0.7.4
+  math_expressions: ^3.0.0
 
   # Theme
   material_color_utilities: ^0.11.1
