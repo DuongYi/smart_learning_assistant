@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:smart_learning_assistant/core/routes/routes.dart';
 import 'package:smart_learning_assistant/modules/auth/login_screen.dart';
+import 'package:smart_learning_assistant/modules/document/view/document_screen.dart';
 import 'package:smart_learning_assistant/modules/home/presentation/view/home_screen.dart';
 import 'package:smart_learning_assistant/modules/home/presentation/view/profile_view/setting_screen.dart';
 import 'package:smart_learning_assistant/modules/smart_assistant/presentation/view/qa_screen.dart';
@@ -33,6 +34,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.settingScreen,
         builder: (context, state) => const SettingScreen(),
+      ),
+
+      // Document
+      GoRoute(
+        path: Routes.documentScreen,
+        builder: (context, state) => const DocumentScreen(),
       ),
     ],
   );

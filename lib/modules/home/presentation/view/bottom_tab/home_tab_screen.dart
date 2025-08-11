@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:smart_learning_assistant/constant/assets_path.dart';
 import 'package:smart_learning_assistant/core/routes/routes.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -308,16 +310,16 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
                   SizedBox(height: 20),
 
                   // Hiển thị nội dung tab đang chọn
-                  HomeTitleWidget(title: "Lịch sử hội thoại"),
+                  HomeTitleWidget(title: "Lịch sử hỏi đáp"),
                   const SizedBox(height: 8),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       spacing: 10,
                       children: const [
-                        RecentChip(label: "Job finder UX"),
-                        RecentChip(label: "Graphic design copy"),
-                        RecentChip(label: "Food planner"),
+                        RecentChip(label: "Giải phương trình bậc 2"),
+                        RecentChip(label: "Lập kế hoạch học tập"),
+                        RecentChip(label: "Lập dàn ý bài văn Chuyện Đôi Ta"),
                       ],
                     ),
                   ),
@@ -348,7 +350,7 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
                         label: "Tài liệu",
                         color: const Color(0xFFFFB800),
                         onTap: () {
-                          // TODO: Chuyển sang màn tài liệu
+                          context.push(Routes.documentScreen);
                         },
                       ),
                     ],
@@ -528,7 +530,7 @@ class _BannerCarouselState extends State<_BannerCarousel> {
                     ),
                   ],
                   image: DecorationImage(
-                    image: NetworkImage(_images[index]),
+                    image: CachedNetworkImageProvider(_images[index]),
                     fit: BoxFit.cover,
                   ),
                 ),

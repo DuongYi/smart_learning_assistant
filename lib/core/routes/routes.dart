@@ -13,4 +13,7 @@ class Routes {
 
   // Calculator
   static const String calculatorScreen = '/calculator_screen';
+
+  // Document
+  static const String documentScreen = '/document_screen';
 }

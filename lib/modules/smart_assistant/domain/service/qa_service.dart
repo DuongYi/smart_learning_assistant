@@ -12,7 +12,7 @@ class QAService {
     : _dio = dio ?? Dio(),
       _apiKey =
           apiKey ??
-          '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';
+          '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';
 
   /// Gửi câu hỏi (text) và/hoặc ảnh lên OpenAI API, trả về phản hồi dạng text
   Future<String> sendQuestion({required String question, File? image}) async {
@@ -33,7 +33,7 @@ class QAService {
             },
           ),
           data: {
-            'model': 'openai/gpt-4o',
+            'model': 'deepseek/deepseek-r1',
             'messages': [
               {'role': 'user', 'content': question},
             ],

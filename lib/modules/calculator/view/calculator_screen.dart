@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:smart_learning_assistant/base/widget/k_text.dart';
 
 import 'package:smart_learning_assistant/modules/calculator/controller/calculator_controller.dart';
 import 'package:smart_learning_assistant/base/ui/base_page_screen.dart';
+
+final showAdvancedProvider = StateProvider<bool>((ref) => true);
 
 class CalculatorScreen extends BasePageScreen {
   const CalculatorScreen({super.key});
@@ -18,17 +22,23 @@ class CalculatorScreen extends BasePageScreen {
   Widget buildBody(BuildContext context, WidgetRef ref) {
     final state = ref.watch(calculatorProvider);
     final notifier = ref.read(calculatorProvider.notifier);
-    final buttons = [
-      ['7', '8', '9', '÷'],
-      ['4', '5', '6', '×'],
-      ['1', '2', '3', '-'],
-      ['0', '.', 'C', '+'],
-      ['='],
+    final advancedButtons = [
+      ['sin', 'cos', 'tan', '^', '√'],
+      ['(', ')', 'log', 'ln', '%'],
+    ];
+    final basicButtons = [
+      ['B', '⌫', 'C', '÷'],
+      ['7', '8', '9', 'x'],
+      ['4', '5', '6', '-'],
+      ['1', '2', '3', '+'],
+      ['+/-', '0', '.', '='],
     ];
 
+    final showAdvanced = ref.watch(showAdvancedProvider);
     return SafeArea(
       child: Column(
         children: [
+          // Hiển thị biểu thức và kết quả
           Expanded(
             child: Container(
               width: double.infinity,
@@ -56,10 +66,37 @@ class CalculatorScreen extends BasePageScreen {
               ),
             ),
           ),
-          ...buttons.map(
+          // Menu nhỏ các nút nâng cao
+          if (showAdvanced)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Column(
+                children: advancedButtons
+                    .map(
+                      (row) => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: row
+                            .map(
+                              (btn) => _buildButton(
+                                context,
+                                btn,
+                                notifier,
+                                isSmall: true,
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          // Bàn phím số cơ bản
+          ...basicButtons.map(
             (row) => Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: row.map((btn) => _buildButton(btn, notifier)).toList(),
+              children: row
+                  .map((btn) => _buildButton(context, btn, notifier))
+                  .toList(),
             ),
           ),
         ],
@@ -67,24 +104,74 @@ class CalculatorScreen extends BasePageScreen {
     );
   }
 
-  Widget _buildButton(String value, CalculatorNotifier notifier) {
-    final isOperator = '+-×÷='.contains(value);
+  Widget _buildButton(
+    BuildContext context,
+    String value,
+    CalculatorNotifier notifier, {
+    bool isSmall = false,
+  }) {
+    if (value.isEmpty) {
+      return SizedBox(width: isSmall ? 50 : 70, height: isSmall ? 50 : 70);
+    }
+    final isOperator =
+        '+-×÷=^√logln%'.contains(value) ||
+        value == 'sin' ||
+        value == 'cos' ||
+        value == 'tan';
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(isSmall ? 6.0 : 8.0),
       child: SizedBox(
-        width: 70,
-        height: 70,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: isOperator ? Colors.deepPurple : Colors.grey[850],
-            foregroundColor: Colors.white,
-            shape: const CircleBorder(),
-            elevation: 2,
+        width: isSmall ? 56 : 70,
+        height: isSmall ? 56 : 70,
+        child: Container(
+          decoration: BoxDecoration(
+            color: isOperator ? Colors.deepOrange : Colors.grey[800],
+            borderRadius: isSmall
+                ? BorderRadius.circular(12)
+                : BorderRadius.circular(50),
           ),
-          onPressed: () => notifier.input(value),
-          child: Text(
-            value,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: isSmall
+                  ? BorderRadius.circular(12)
+                  : BorderRadius.circular(50),
+              onTap: () {
+                final contextRef = ProviderScope.containerOf(
+                  context,
+                  listen: false,
+                );
+                if (value == 'B') {
+                  final show = contextRef.read(showAdvancedProvider);
+                  contextRef.read(showAdvancedProvider.notifier).state = !show;
+                } else if (value == '+/-') {
+                  notifier.input(value);
+                } else {
+                  notifier.input(value);
+                }
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: isSmall
+                      ? BorderRadius.circular(12)
+                      : BorderRadius.circular(50),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: KText(
+                  text: value,
+                  color: Colors.white,
+                  fontSize: isSmall ? 16 : 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ),
         ),
       ),
