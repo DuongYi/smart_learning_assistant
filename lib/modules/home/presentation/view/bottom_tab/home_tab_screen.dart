@@ -350,7 +350,7 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
                         label: "Tài liệu",
                         color: const Color(0xFFFFB800),
                         onTap: () {
-                          context.push(Routes.documentScreen);
+                          context.push(Routes.freeAssistantScreen);
                         },
                       ),
                     ],

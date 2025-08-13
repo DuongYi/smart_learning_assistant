@@ -12,7 +12,7 @@ class QAService {
     : _dio = dio ?? Dio(),
       _apiKey =
           apiKey ??
-          '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';
+          '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';
 
   /// Gửi câu hỏi (text) và/hoặc ảnh lên OpenAI API, trả về phản hồi dạng text
   Future<String> sendQuestion({required String question, File? image}) async {

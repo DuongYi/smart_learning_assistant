@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:smart_learning_assistant/base/widget/k_text.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
+import 'package:smart_learning_assistant/modules/free_assistant/domain/service/free_assistant_db_service.dart';
+import 'package:smart_learning_assistant/modules/free_assistant/presentation/controller/free_assistant_controller.dart';
 
 class FreeAssistantScreen extends ConsumerStatefulWidget {
   const FreeAssistantScreen({super.key});
@@ -15,37 +15,15 @@ class FreeAssistantScreen extends ConsumerStatefulWidget {
 
 class _FreeAssistantScreenState extends ConsumerState<FreeAssistantScreen> {
   final TextEditingController _textController = TextEditingController();
-  File? _selectedImage;
-  final ImagePicker _picker = ImagePicker();
   final _scrollController = ScrollController();
 
-  Future<void> _pickImage() async {
-    final XFile? picked = await _picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      setState(() {
-        _selectedImage = File(picked.path);
-      });
-    }
-  }
-
-  Future<void> _pickCamera() async {
-    final XFile? picked = await _picker.pickImage(source: ImageSource.camera);
-    if (picked != null) {
-      setState(() {
-        _selectedImage = File(picked.path);
-      });
-    }
-  }
-
   Future<void> _sendMessage() async {
-    final qaController = ref.read(qAControllerProvider.notifier);
+    final faController = ref.read(freeAssistantControllerProvider.notifier);
     final text = _textController.text.trim();
-    if (text.isEmpty && _selectedImage == null) return;
-    await qaController.sendQuestion(question: text, image: _selectedImage);
+    if (text.isEmpty) return;
+    await faController.sendQuestion(question: text);
     _textController.clear();
-    setState(() {
-      _selectedImage = null;
-    });
+
     await Future.delayed(const Duration(milliseconds: 300));
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent,
@@ -56,218 +34,142 @@ class _FreeAssistantScreenState extends ConsumerState<FreeAssistantScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(qAControllerProvider);
+    final state = ref.watch(freeAssistantControllerProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Material(
-      child: Container(
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Custom AppBar
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                    KText(
-                      text: 'Q&A Assistant',
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.white),
-                      onPressed: () {
-                        ref.read(qAControllerProvider.notifier).clearHistory();
-                      },
-                    ),
-                  ],
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Custom AppBar
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.of(context).pop(),
                 ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(12),
-                  itemCount: state.history.length,
-                  itemBuilder: (context, index) {
-                    final msg = state.history[index];
-                    final isUser = msg.isUser;
-                    return Align(
-                      alignment: isUser
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 6),
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.75,
-                        ),
-                        child: Material(
-                          color: isUser
-                              ? Colors.deepPurple[400]
-                              : (isDark
-                                    ? const Color(0xFF23262F)
-                                    : Colors.grey[200]),
-                          borderRadius: BorderRadius.circular(18),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (msg.text.isNotEmpty)
-                                  _buildMessageContent(msg.text),
-                                if (msg.imagePath != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 6.0),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.file(
-                                        File(msg.imagePath!),
-                                        width: 140,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
+                KText(
+                  text: 'Hỏi đáp miễn phí',
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 21,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.white),
+                  onPressed: () {
+                    ref
+                        .read(freeAssistantControllerProvider.notifier)
+                        .clearHistory();
                   },
                 ),
+              ],
+            ),
+            Expanded(
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.all(12),
+                itemCount: state.history.length,
+                itemBuilder: (context, index) {
+                  final msg = state.history[index];
+                  final isUser = msg.isUser;
+                  return Align(
+                    alignment: isUser
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.75,
+                      ),
+                      child: Material(
+                        color: isUser
+                            ? Colors.deepPurple[400]
+                            : (isDark
+                                  ? const Color(0xFF23262F)
+                                  : Colors.grey[200]),
+                        borderRadius: BorderRadius.circular(18),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (msg.question.isNotEmpty)
+                                _buildMessageContent(msg.question),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
-              if (state.isLoading)
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(),
-                ),
-              if (state.error != null)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Lỗi: ${state.error}',
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-              if (_selectedImage != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                  child: Stack(
-                    alignment: Alignment.topRight,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          _selectedImage!,
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
+            ),
+            if (state.isLoading)
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircularProgressIndicator(),
+              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF23262F)
+                            : Colors.grey[200],
+                        borderRadius: BorderRadius.circular(18),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.close, size: 20),
-                        onPressed: () => setState(() => _selectedImage = null),
-                      ),
-                    ],
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
-                child: Row(
-                  children: [
-                    PopupMenuButton<int>(
-                      icon: const Icon(Icons.image, color: Colors.white),
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          value: 0,
-                          child: Row(
-                            children: const [
-                              Icon(Icons.photo, size: 18),
-                              SizedBox(width: 8),
-                              Text('Chọn từ thư viện'),
-                            ],
+                      child: TextField(
+                        controller: _textController,
+                        minLines: 1,
+                        maxLines: 4,
+                        style: const TextStyle(fontSize: 16),
+                        decoration: InputDecoration(
+                          hintText: 'Đặt câu hỏi...',
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
                           ),
                         ),
-                        PopupMenuItem(
-                          value: 1,
-                          child: Row(
-                            children: const [
-                              Icon(Icons.camera_alt, size: 18),
-                              SizedBox(width: 8),
-                              Text('Chụp ảnh'),
-                            ],
-                          ),
+                        onSubmitted: (_) => _sendMessage(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(206, 255, 255, 255),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFC2C2C2),
+                          blurRadius: 4,
                         ),
                       ],
-                      onSelected: (value) {
-                        if (value == 0) _pickImage();
-                        if (value == 1) _pickCamera();
-                      },
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF23262F)
-                              : Colors.grey[200],
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: TextField(
-                          controller: _textController,
-                          minLines: 1,
-                          maxLines: 4,
-                          style: const TextStyle(fontSize: 16),
-                          decoration: InputDecoration(
-                            hintText: 'Type your question...',
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                          onSubmitted: (_) => _sendMessage(),
-                        ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons
+                            .send_rounded, // hoặc Icons.play_arrow nếu bạn muốn
+                        size: 24,
+                        color: Colors.black, // nét đen giống hình
                       ),
+                      onPressed: state.isLoading ? null : _sendMessage,
                     ),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(206, 255, 255, 255),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFC2C2C2),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: IconButton(
-                        icon: Icon(
-                          Icons
-                              .send_rounded, // hoặc Icons.play_arrow nếu bạn muốn
-                          size: 24,
-                          color: Colors.black, // nét đen giống hình
-                        ),
-                        onPressed: state.isLoading ? null : _sendMessage,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -331,7 +233,7 @@ class _FreeAssistantScreenState extends ConsumerState<FreeAssistantScreen> {
               formula,
               textStyle: const TextStyle(
                 fontSize: 18,
-                color: Colors.deepPurple,
+                color: Color.fromARGB(255, 109, 243, 238),
               ),
             ),
           ),

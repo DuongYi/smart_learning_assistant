@@ -16,4 +16,7 @@ class Routes {
 
   // Document
   static const String documentScreen = '/document_screen';
+
+  // Free Assistant
+  static const String freeAssistantScreen = '/free_assistant_screen';
 }
