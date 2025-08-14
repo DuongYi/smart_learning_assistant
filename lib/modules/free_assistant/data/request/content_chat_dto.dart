@@ -13,6 +13,32 @@ class ContentChatDTO with _$ContentChatDTO {
   factory ContentChatDTO.fromJson(Map<String, dynamic> json) =>
       _$ContentChatDTOFromJson(json);
 
+  // Chỉ text
+  factory ContentChatDTO.userText(String text) =>
+      ContentChatDTO(parts: [PartChatDTO(text: text)]);
+
+  // Ảnh base64 + prompt
+  factory ContentChatDTO.userImageBase64(
+    String base64Data, {
+    String mimeType = 'image/jpeg',
+    String? prompt,
+  }) => ContentChatDTO(
+    parts: [
+      PartChatDTO(
+        inlineData: InlineDataDTO(mimeType: mimeType, data: base64Data),
+      ),
+      if (prompt?.isNotEmpty == true) PartChatDTO(text: prompt),
+    ],
+  );
+
+  // Append text
+  // ContentChatDTO appendText(String text) => copyWith(
+  //   parts: [
+  //     ...parts,
+  //     PartChatDTO(text: text),
+  //   ],
+  // );
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

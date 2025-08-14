@@ -39,7 +39,7 @@ final class FreeAssistantControllerProvider
 }
 
 String _$freeAssistantControllerHash() =>
-    r'05d5097d1f734fdd81f7f73fabab14282f4ed8e9';
+    r'deea535e693f9281dd8270b931bcff7f1ba23a9b';
 
 abstract class _$FreeAssistantController extends $Notifier<FreeAssistantState> {
   FreeAssistantState build();

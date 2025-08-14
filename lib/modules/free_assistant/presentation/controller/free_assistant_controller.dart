@@ -39,7 +39,7 @@ class FreeAssistantController extends _$FreeAssistantController {
       isLoading: true,
       listPartChat: <PartChatDTO>[
         ...state.listPartChat,
-        PartChatDTO(question: question),
+        PartChatDTO(text: question),
       ],
     );
 
